@@ -1,16 +1,74 @@
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/display.h>
 
 / {
     chosen {
         zmk,matrix_transform = &sofle_transform;
+        zmk,display = &oled;
     };
 
-    oled_display: oled_display {
-        compatible = "solmon,oled";
+    oled: display {
+        compatible = "solomon,ssd1306fb";
+        i2c-bus = <&i2c0>;
+        reg = <0x3c>;
+        width = <128>;
+        height = <64>;
         status = "okay";
-        format = "SOFLE\nLAYER: %d\nBAT: %d%% | %s\nWPM: %d";
+
+        layers {
+            compatible = "zmk,display-layers";
+
+            default_layer {
+                label = "BASE";
+                format = "SOFLE\n[%l] %b%% %c\nBT:%t\nWPM:%w";
+            };
+
+            raise_layer {
+                label = "RAISE";
+                format = "SOFLE\n[%l] %b%% %c\nBT:%t\nWPM:%w";
+            };
+
+            lower_layer {
+                label = "LOWER";
+                format = "SOFLE\n[%l] %b%% %c\nBT:%t\nWPM:%w";
+            };
+        };
+
+        widgets {
+            compatible = "zmk,display-widgets";
+
+            battery {
+                compatible = "zmk,display-widget-battery";
+                position = <0 0>;
+                size = <32 16>;
+            };
+
+            bluetooth {
+                compatible = "zmk,display-widget-bluetooth";
+                position = <96 0>;
+                size = <32 16>;
+            };
+
+            layer {
+                compatible = "zmk,display-widget-layer";
+                position = <0 48>;
+                size = <128 16>;
+            };
+
+            wpm {
+                compatible = "zmk,display-widget-wpm";
+                position = <64 32>;
+                size = <64 16>;
+            };
+        };
+
+        status {
+            compatible = "zmk,display-status";
+            format = "SOFLE\nLAYER:%l BAT:%b%%\n%t | WPM:%w";
+            refresh-ms = <1000>;
+        };
     };
 
     keymap {
